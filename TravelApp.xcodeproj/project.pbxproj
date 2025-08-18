@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6F12DBB12E4CF1FF001D9968 /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 6F12DBB02E4CF1FF001D9968 /* OpenAPIRuntime */; };
+		6F12DBB42E4CF26B001D9968 /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 6F12DBB32E4CF26B001D9968 /* OpenAPIURLSession */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6F12DB8E2E4CEBDD001D9968 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +34,33 @@
 		6F12DB972E4CEBDD001D9968 /* TravelAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6F12DBF22E4CF7BF001D9968 /* Exceptions for "TravelApp" folder in "TravelApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"yaml/openapi-generator-config.yaml",
+			);
+			target = 6F12DB7F2E4CEBDB001D9968 /* TravelApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		6F12DBF32E4CF7BF001D9968 /* Exceptions for "TravelApp" folder in "Compile Sources" phase from "TravelApp" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 6F12DB7C2E4CEBDB001D9968 /* Sources */;
+			membershipExceptions = (
+				"yaml/openapi-generator-config.yaml",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6F12DB822E4CEBDB001D9968 /* TravelApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6F12DBF22E4CF7BF001D9968 /* Exceptions for "TravelApp" folder in "TravelApp" target */,
+				6F12DBF32E4CF7BF001D9968 /* Exceptions for "TravelApp" folder in "Compile Sources" phase from "TravelApp" target */,
+			);
 			path = TravelApp;
 			sourceTree = "<group>";
 		};
@@ -52,6 +81,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F12DBB42E4CF26B001D9968 /* OpenAPIURLSession in Frameworks */,
+				6F12DBB12E4CF1FF001D9968 /* OpenAPIRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,12 +137,15 @@
 			buildRules = (
 			);
 			dependencies = (
+				6F12DBE72E4CF5AD001D9968 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				6F12DB822E4CEBDB001D9968 /* TravelApp */,
 			);
 			name = TravelApp;
 			packageProductDependencies = (
+				6F12DBB02E4CF1FF001D9968 /* OpenAPIRuntime */,
+				6F12DBB32E4CF26B001D9968 /* OpenAPIURLSession */,
 			);
 			productName = TravelApp;
 			productReference = 6F12DB802E4CEBDB001D9968 /* TravelApp.app */;
@@ -195,6 +229,11 @@
 			);
 			mainGroup = 6F12DB772E4CEBDB001D9968;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6F12DBAF2E4CF1FF001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
+				6F12DBB22E4CF26B001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
+				6F12DBE52E4CF599001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6F12DB812E4CEBDB001D9968 /* Products */;
 			projectDirPath = "";
@@ -265,6 +304,10 @@
 			isa = PBXTargetDependency;
 			target = 6F12DB7F2E4CEBDB001D9968 /* TravelApp */;
 			targetProxy = 6F12DB982E4CEBDD001D9968 /* PBXContainerItemProxy */;
+		};
+		6F12DBE72E4CF5AD001D9968 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6F12DBE62E4CF5AD001D9968 /* OpenAPIGenerator */;
 		};
 /* End PBXTargetDependency section */
 
@@ -550,6 +593,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6F12DBAF2E4CF1FF001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-runtime/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.2;
+			};
+		};
+		6F12DBB22E4CF26B001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-urlsession";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+		6F12DBE52E4CF599001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-generator";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.10.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6F12DBB02E4CF1FF001D9968 /* OpenAPIRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F12DBAF2E4CF1FF001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */;
+			productName = OpenAPIRuntime;
+		};
+		6F12DBB32E4CF26B001D9968 /* OpenAPIURLSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F12DBB22E4CF26B001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
+			productName = OpenAPIURLSession;
+		};
+		6F12DBE62E4CF5AD001D9968 /* OpenAPIGenerator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6F12DBE52E4CF599001D9968 /* XCRemoteSwiftPackageReference "swift-openapi-generator" */;
+			productName = "plugin:OpenAPIGenerator";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6F12DB782E4CEBDB001D9968 /* Project object */;
 }
