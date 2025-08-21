@@ -11,7 +11,7 @@ struct ContentView: View {
         }
         .padding()
         .onAppear {
-            testCarrierService()
+            testRouteStations()
         }
     }
 }
@@ -40,61 +40,71 @@ func testNearestStations() {  //Working well
     }
 }
 
-func testCarrierService() {
+func testCarrierService() { //Working well
     Task {
         do {
             let client = Client(
                 serverURL: try Servers.Server1.url(),
                 transport: URLSessionTransport()
             )
+            
             let service = CarrierService(
                 client: client,
                 apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
             )
-            print("Fetching carrier..")
-            let carrierResponse = try await service.getCarrierInfo(
-                code: "SU",
-                system: "iata"
-            )
-            print("Successfully fetched carriers: \(carrierResponse)")
-            if let carriers = carrierResponse.carriers, !carriers.isEmpty {
-                for carrier in carriers {
-                    print("Carrier name: \(carrier.title ?? "")")
-                    print("Carrier code: \(carrier.code ?? 0)")
-                    print("Carrier url: \(carrier.url ?? "–")")
-                }
-            } else {
-                print("No carriers found for this code")
-            }
+            
+            let result = try await service.getCarrierInfo(code: "LH", system: "iata")
+            print("\(result)")
         } catch {
             print("Error fetching carriers: \(error)")
         }
     }
 }
 
-func testRouteStations() {
+func testRouteStations() {  //Working Well
     Task {
         do {
             let client = Client(
                 serverURL: try Servers.Server1.url(),
                 transport: URLSessionTransport()
             )
-            let service = RouteStationsService(
+            
+            let scheduleService = StationScheduleService(
                 client: client,
                 apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
             )
-            print("Fetching stations..")
-            let stations = try await service.getRouteStations(
-                uid: "s9600213"
+            
+            let station = "s9600213"
+            
+            print("Fetching schedule..")
+            let scheduleResponse = try await scheduleService.getStationSchedule(
+                station: station
             )
-            print("Successfully fetched stations: \(stations)")
+            
+            guard let firstSegment = scheduleResponse.schedule?.first,
+                  let threadUID = firstSegment.thread?.uid else {
+                print("No segments found")
+                return
+            }
+            
+            print("Found thread UID: \(threadUID)")
+            
+            let routeStationsService = RouteStationsService(
+                client: client,
+                apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
+            )
+            
+            let stationsResponse = try await routeStationsService.getRouteStations(uid: threadUID)
+            
+            print("Successfully fetched stations: \(stationsResponse)")
+            
         } catch {
-            print("Error fetching stations: \(error)")
+            print("Error fetching route stations: \(error)")
         }
     }
 }
 
-func testAllStations() {
+func testAllStations() { //Working well
     Task {
         do {
             let client = Client(
@@ -114,7 +124,7 @@ func testAllStations() {
     }
 }
 
-func testNearestCity() {
+func testNearestCity() { //Working well
     Task {
         do {
             let client = Client(
@@ -126,7 +136,7 @@ func testNearestCity() {
                 apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
             )
             print("Fetching cities..")
-            let cities = try await service.getNearestCity(lat: 222, lng: 111)
+            let cities = try await service.getNearestCity(lat:  55.7558, lng:  37.6176)
             print("Successfully fetched cities: \(cities)")
         } catch {
             print("Error fetching cities: \(error)")
@@ -134,7 +144,7 @@ func testNearestCity() {
     }
 }
 
-func testCopyright() {
+func testCopyright() {  //Working well
     Task {
         do {
             let client = Client(
@@ -154,7 +164,7 @@ func testCopyright() {
     }
 }
 
-func testStationSchedule() {
+func testStationSchedule() { //Working Well
     Task {
         do {
             let client = Client(
@@ -166,7 +176,7 @@ func testStationSchedule() {
                 apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
             )
             print("Fetching schedule..")
-            let stationSchedule = try await service.getStationSchedule(station: "Msc")
+            let stationSchedule = try await service.getStationSchedule(station: "s9600213")
             print("Successfully fetched station schedule: \(stationSchedule)")
         } catch {
             print("Error fetching stationsSchedule: \(error)")
@@ -174,7 +184,7 @@ func testStationSchedule() {
     }
 }
 
-func testScheduleBetweenStations() {
+func testScheduleBetweenStations() { //Working Well
     Task {
         do {
             let client = Client(
@@ -186,7 +196,7 @@ func testScheduleBetweenStations() {
                 apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
             )
             print("Fetching schedule..")
-            let schedule = try await service.getSchedualBetweenStations(from: "Msc", to: "Spb")
+            let schedule = try await service.getSchedualBetweenStations(from: "c146", to: "c213")
             print("Successfully fetched station schedule: \(schedule)")
         } catch {
             print("Error fetching schedule: \(error)")
