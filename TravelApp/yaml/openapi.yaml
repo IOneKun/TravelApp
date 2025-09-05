@@ -371,7 +371,7 @@ paths:
         - name: system
           in: query
           description: Система кодирования (yandex, iata, sirena, express, esr)
-          required: false
+          required: true
           schema:
             type: string
         - name: lang
@@ -392,7 +392,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Carrier'
+                $ref: '#/components/schemas/CarrierResponse'
   /v3.0/stations_list/:
     get:
       tags:
@@ -647,7 +647,6 @@ components:
           type: string
         start_time:
           type: string
-          format: time
         days:
           type: string
         interval:
@@ -705,10 +704,8 @@ components:
       properties:
         arrival:
           type: string
-          format: date-time
         departure:
           type: string
-          format: date-time
         stop_time:
           type: integer
           description: Продолжительность остановки в секундах
@@ -791,6 +788,10 @@ components:
             $ref: '#/components/schemas/Directions'
         schedule_direction:
           $ref: '#/components/schemas/Directions'
+        arrival:
+          type: string
+        departure:
+          type: string
     Interval:
       type: object
       properties:
@@ -859,6 +860,8 @@ components:
     CarrierResponse:
       type: object
       properties:
+        carrier:
+            $ref: '#/components/schemas/Carrier'
         carriers:
           type: array
           items:
@@ -923,7 +926,7 @@ components:
        description: Содержит информацию о копирайте, например текст и ссылку на сайт с правами
        properties:
          copyright:
-           type: string
+           type: object
            description: Текст копирайта
          url:
            type: string
