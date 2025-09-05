@@ -11,7 +11,7 @@ struct ContentView: View {
         }
         .padding()
         .onAppear {
-            testRouteStations()
+            testStationSchedule()
         }
     }
 }
