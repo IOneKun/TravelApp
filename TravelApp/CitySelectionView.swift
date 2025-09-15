@@ -1,0 +1,107 @@
+import SwiftUI
+
+struct CitySelectionView: View {
+    @Environment(\.dismiss) private var dismiss
+    let onSelect: (String) -> Void
+    
+    @State private var searchText = ""
+    
+    private let cities = [
+        "Москва",
+        "Санкт-Петербург",
+        "Сочи",
+        "Горный Воздух",
+        "Краснодар",
+        "Казань",
+        "Омск"
+    ]
+    
+    private var filteredCities: [String] {
+        if searchText.isEmpty {
+            return cities
+        } else {
+            return cities.filter { $0.localizedCaseInsensitiveContains(searchText)}
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(Color("Gray_Universal"))
+                
+                TextField("Введите запрос", text: $searchText)
+                    .foregroundColor(Color("Black_Universal"))
+                    .autocorrectionDisabled(true)
+                
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(Color("Gray_Unviversal"))
+                    }
+                }
+            }
+            .frame(height: 36)
+            .background(Color("Light_Gray"))
+            .cornerRadius(10)
+            .padding(.horizontal)
+            
+            if filteredCities.isEmpty && !searchText.isEmpty {
+                VStack {
+                    Spacer()
+                    Text("Город не найден")
+                        .foregroundColor(Color("Black_Universal"))
+                        .font(.system(size: 24, weight: .bold))
+                        .padding(.vertical, 20)
+                    Spacer()
+                }
+            } else {
+                List {
+                    ForEach(filteredCities, id: \.self) { city in
+                        Button {
+                            onSelect(city)
+                            dismiss()
+                        } label: {
+                            HStack {
+                                Text(city)
+                                    .foregroundColor(.black)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.black)
+                            }
+                            .frame(height: 60)
+                            .contentShape(Rectangle())
+                        }
+                        .listRowBackground(Color.white)
+                        .buttonStyle(PlainButtonStyle())
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    }
+                }
+            }
+        }
+        .listStyle(PlainListStyle())
+        .background(Color.white)
+        .navigationTitle("Выбор города")
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                }
+            }
+        }
+    }
+}
+
+struct StationSelectionView: View {
+    let city: String
+    
+    var body: some View {
+        Text("Выбор станции в \(city)")
+            .navigationTitle("Станции")
+    }
+}
