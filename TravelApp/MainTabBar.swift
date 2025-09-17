@@ -1,23 +1,29 @@
 import SwiftUI
 
+enum MainDestination: Hashable {
+    case citySelection(selectingFromCity: Bool)
+    case stationSelection(city: String, selectingFromCity: Bool)
+}
+
 struct MainView: View {
     @State private var fromCity: String = ""
     @State private var toCity: String = ""
+    @State private var path = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             TabView {
                 VStack {
                     Spacer()
                     VStack(spacing: 0) {
-                        NavigationLink {
-                            CitySelectionView { selectedCity in
-                                fromCity = selectedCity
-                            }
+                        Button {
+                            path.append(MainDestination.citySelection(selectingFromCity: true))
                         } label: {
                             HStack {
                                 Text(fromCity.isEmpty ? "Откуда" : fromCity)
                                     .foregroundColor(fromCity.isEmpty ? .gray : .black)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
                                 Spacer()
                             }
                             .padding()
@@ -25,15 +31,14 @@ struct MainView: View {
                             .cornerRadius(20)
                             .frame(width: 259)
                         }
-                        
-                        NavigationLink {
-                            CitySelectionView { selectedCity in
-                                toCity = selectedCity
-                            }
+                        Button {
+                            path.append(MainDestination.citySelection(selectingFromCity: false))
                         } label: {
                             HStack {
                                 Text(toCity.isEmpty ? "Куда" : toCity)
                                     .foregroundColor(toCity.isEmpty ? .gray : .black)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
                                 Spacer()
                             }
                             .padding()
@@ -61,6 +66,7 @@ struct MainView: View {
                             .offset(x: -8),
                         alignment: .trailing
                     )
+                    
                     Button(action: searchAction) {
                         Text("Найти")
                             .foregroundColor(.white)
@@ -82,6 +88,28 @@ struct MainView: View {
                     }
             }
             .tint(.black)
+            .navigationDestination(for: MainDestination.self) { destination in
+                switch destination {
+                case .citySelection(let selectingFromCity):
+                    CitySelectionView { selectedCity in
+                        if selectingFromCity {
+                            fromCity = selectedCity
+                        } else {
+                            toCity = selectedCity
+                        }
+                        path.removeLast(path.count)
+                    }
+                case .stationSelection(let city, let selectingFromCity):
+                    StationSelectionView(city: city) { station in
+                        if selectingFromCity {
+                            fromCity = station
+                        } else {
+                            toCity = station 
+                        }
+                        path.removeLast(path.count)
+                    }
+                }
+            }
         }
     }
     
@@ -90,6 +118,7 @@ struct MainView: View {
         fromCity = toCity
         toCity = temp
     }
+    
     private func searchAction() {
         print("Ищем: \(fromCity) → \(toCity)")
     }
@@ -103,6 +132,8 @@ struct SettingsView: View {
         }
     }
 }
-#Preview() {
+
+#Preview {
     MainView()
 }
+

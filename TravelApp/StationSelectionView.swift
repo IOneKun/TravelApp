@@ -2,29 +2,21 @@ import SwiftUI
 import OpenAPIRuntime
 import OpenAPIURLSession
 
-struct CitySelectionView: View {
+struct StationSelectionView: View {
     @Environment(\.dismiss) private var dismiss
+    let city: String
     let onSelect: (String) -> Void
     
     @State private var searchText = ""
-    @State private var selectedCity: String? = nil
-    @State private var goToStations = false
+    @State private var stations: [StationUI] = []
+    @State private var isLoading = true
+    @State private var errorMessage: String?
     
-    private let cities = [
-        "Москва",
-        "Санкт-Петербург",
-        "Сочи",
-        "Горный Воздух",
-        "Краснодар",
-        "Казань",
-        "Омск"
-    ]
-    
-    private var filteredCities: [String] {
+    private var filteredStations: [StationUI] {
         if searchText.isEmpty {
-            return cities
+            return stations
         } else {
-            return cities.filter { $0.localizedCaseInsensitiveContains(searchText)}
+            return stations.filter { $0.name.localizedCaseInsensitiveContains(searchText)}
         }
     }
     
@@ -50,24 +42,24 @@ struct CitySelectionView: View {
             .cornerRadius(10)
             .padding(.horizontal)
             
-            if filteredCities.isEmpty && !searchText.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("Город не найден")
-                        .foregroundColor(Color("Black_Universal"))
-                        .font(.system(size: 24, weight: .bold))
-                        .padding(.vertical, 20)
-                    Spacer()
-                }
+            if isLoading {
+                ProgressView("Загрузка станций…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let errorMessage = errorMessage {
+                Text("Ошибка: \(errorMessage)")
+                    .foregroundColor(.red)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if stations.isEmpty {
+                Text("Станции не найдены")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
-                    ForEach(filteredCities, id: \.self) { city in
+                    ForEach(filteredStations) { station in
                         Button {
-                            selectedCity = city
-                            goToStations = true
+                            onSelect("\(station.name)")
                         } label: {
                             HStack {
-                                Text(city)
+                                Text(station.name)
                                     .foregroundColor(.black)
                                 Spacer()
                                 Image(systemName: "chevron.right")
@@ -82,11 +74,10 @@ struct CitySelectionView: View {
                         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
+                .listStyle(PlainListStyle())
             }
         }
-        .listStyle(PlainListStyle())
-        .background(Color.white)
-        .navigationTitle("Выбор города")
+        .navigationTitle("Выбор станции")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -98,15 +89,28 @@ struct CitySelectionView: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $goToStations) {
-            if let city = selectedCity {
-                StationSelectionView(city: city) { selectedStation in
-                    onSelect(selectedStation)
-                }
-            }
+        .task {
+            await loadStations()
+        }
+    }
+    
+    private func loadStations() async {
+        do {
+            let client = Client(
+                serverURL: try Servers.Server1.url(),
+                transport: URLSessionTransport()
+            )
+            let service = AllStationsService(
+                client: client,
+                apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
+            )
+            
+            let response = try await service.getAllStations()
+            self.stations = response.toUIModels(for: city)
+            self.isLoading = false
+        } catch {
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
         }
     }
 }
-
-
-
