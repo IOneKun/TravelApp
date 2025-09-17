@@ -23,7 +23,7 @@ final class AllStationsService: AllStationsServiceProtocol {
 
        let responseBody = try response.ok.body.html
 
-       let limit = 50 * 1024 * 1024 // 50Mb
+       let limit = 50 * 1024 * 1024 
         
         let fullData = try await Data(collecting: responseBody, upTo: limit)
 
@@ -32,4 +32,39 @@ final class AllStationsService: AllStationsServiceProtocol {
        return allStations
     }
 }
+
+struct StationUI: Identifiable {
+    let id: String
+    let name: String
+    let city: String
+}
+
+extension AllStations {
+    func toUIModels(for city: String) -> [StationUI] {
+        var result: [StationUI] = []
+        
+        countries?.forEach { country in
+            country.regions?.forEach { region in
+                region.settlements?.forEach { settlement in
+                    if settlement.title == city {
+                        settlement.stations?.forEach { station in
+                            if let id = station.codes?.yandex_code,
+                               let name = station.title {
+                                result.append(
+                                    StationUI(
+                                        id: id,
+                                        name: name,
+                                        city: settlement.title ?? "—"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result
+    }
+}
+
 
