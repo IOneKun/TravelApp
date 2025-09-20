@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6F12DBB12E4CF1FF001D9968 /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 6F12DBB02E4CF1FF001D9968 /* OpenAPIRuntime */; };
 		6F12DBB42E4CF26B001D9968 /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 6F12DBB32E4CF26B001D9968 /* OpenAPIURLSession */; };
+		6FA97ABB2E7BB0D200A831E3 /* RoutesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FA97ABA2E7BB0D200A831E3 /* RoutesViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +33,7 @@
 		6F12DB802E4CEBDB001D9968 /* TravelApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F12DB8D2E4CEBDD001D9968 /* TravelAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F12DB972E4CEBDD001D9968 /* TravelAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FA97ABA2E7BB0D200A831E3 /* RoutesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutesViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -106,6 +108,7 @@
 		6F12DB772E4CEBDB001D9968 = {
 			isa = PBXGroup;
 			children = (
+				6FA97ABA2E7BB0D200A831E3 /* RoutesViewModel.swift */,
 				6F12DB822E4CEBDB001D9968 /* TravelApp */,
 				6F12DB902E4CEBDD001D9968 /* TravelAppTests */,
 				6F12DB9A2E4CEBDD001D9968 /* TravelAppUITests */,
@@ -275,6 +278,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6FA97ABB2E7BB0D200A831E3 /* RoutesViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

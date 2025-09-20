@@ -1,14 +1,16 @@
 import SwiftUI
+import OpenAPIRuntime
+import OpenAPIURLSession
 
 enum MainDestination: Hashable {
-    case citySelection(selectingFromCity: Bool)
-    case stationSelection(city: String, selectingFromCity: Bool)
+    case stationSelection(selectingFromStation: Bool)
 }
 
 struct MainView: View {
-    @State private var fromCity: String = ""
-    @State private var toCity: String = ""
+    @State private var fromStation: StationUI?
+    @State private var toStation: StationUI?
     @State private var path = NavigationPath()
+    @State private var isLoading = false
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -17,36 +19,37 @@ struct MainView: View {
                     Spacer()
                     VStack(spacing: 0) {
                         Button {
-                            path.append(MainDestination.citySelection(selectingFromCity: true))
+                            path.append(MainDestination.stationSelection(selectingFromStation: true))
                         } label: {
                             HStack {
-                                Text(fromCity.isEmpty ? "Откуда" : fromCity)
-                                    .foregroundColor(fromCity.isEmpty ? .gray : .black)
+                                Text(fromStation?.name ?? "Откуда")
+                                    .foregroundColor(fromStation == nil ? Color("Gray_Universal") : Color("Black_Universal"))
                                     .lineLimit(1)
                                     .truncationMode(.tail)
                                 Spacer()
                             }
                             .padding()
-                            .background(Color.white)
+                            .background(Color("White_Universal"))
                             .cornerRadius(20)
                             .frame(width: 259)
                         }
                         Button {
-                            path.append(MainDestination.citySelection(selectingFromCity: false))
+                            path.append(MainDestination.stationSelection(selectingFromStation: false))
                         } label: {
                             HStack {
-                                Text(toCity.isEmpty ? "Куда" : toCity)
-                                    .foregroundColor(toCity.isEmpty ? .gray : .black)
+                                Text(toStation?.name ?? "Куда")
+                                    .foregroundColor(toStation == nil ? Color("Gray_Universal") : Color("Black_Universal"))
                                     .lineLimit(1)
                                     .truncationMode(.tail)
                                 Spacer()
                             }
                             .padding()
-                            .background(Color.white)
+                            .background(Color("White_Universal"))
                             .cornerRadius(20)
                             .frame(width: 259)
                         }
                     }
+                    
                     .background(Color.white)
                     .cornerRadius(20)
                     .padding(.trailing, 48)
@@ -59,7 +62,7 @@ struct MainView: View {
                                 .font(.system(size: 24))
                                 .foregroundColor(Color("Blue_Universal"))
                                 .padding(8)
-                                .background(Color.white)
+                                .background(Color("White_Universal"))
                                 .clipShape(Circle())
                                 .shadow(radius: 2)
                         }
@@ -81,30 +84,20 @@ struct MainView: View {
                 .tabItem {
                     Image(systemName: "arrow.up.message.fill")
                 }
-                
                 SettingsView()
                     .tabItem {
                         Image(systemName: "gearshape.fill")
                     }
             }
-            .tint(.black)
+            .tint(Color("Black_Universal"))
             .navigationDestination(for: MainDestination.self) { destination in
                 switch destination {
-                case .citySelection(let selectingFromCity):
-                    CitySelectionView { selectedCity in
-                        if selectingFromCity {
-                            fromCity = selectedCity
+                case .stationSelection(let selectingFromStation):
+                    CitySelectionView { selectedStation in
+                        if selectingFromStation {
+                            fromStation = selectedStation
                         } else {
-                            toCity = selectedCity
-                        }
-                        path.removeLast(path.count)
-                    }
-                case .stationSelection(let city, let selectingFromCity):
-                    StationSelectionView(city: city) { station in
-                        if selectingFromCity {
-                            fromCity = station
-                        } else {
-                            toCity = station 
+                            toStation = selectedStation
                         }
                         path.removeLast(path.count)
                     }
@@ -113,27 +106,27 @@ struct MainView: View {
         }
     }
     
+    
+    
     private func swapCities() {
-        let temp = fromCity
-        fromCity = toCity
-        toCity = temp
+        let temp = fromStation
+        fromStation = toStation
+        toStation = temp
     }
     
     private func searchAction() {
-        print("Ищем: \(fromCity) → \(toCity)")
+        print("searching")
     }
 }
-
-struct SettingsView: View {
-    var body: some View {
-        NavigationStack {
-            Text("Здесь будут настройки")
-                .navigationTitle("Настройки")
+    struct SettingsView: View {
+        var body: some View {
+            NavigationStack {
+                Text("Здесь будут настройки")
+                    .navigationTitle("Настройки")
+            }
         }
     }
+    
+    #Preview {
+        MainView()
 }
-
-#Preview {
-    MainView()
-}
-
