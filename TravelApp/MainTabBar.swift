@@ -4,7 +4,10 @@ import OpenAPIURLSession
 
 enum MainDestination: Hashable {
     case stationSelection(selectingFromStation: Bool)
+    case routeResults(from: StationUI, to: StationUI)
 }
+
+private let apiKey = "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
 
 struct MainView: View {
     @State private var fromStation: StationUI?
@@ -49,7 +52,6 @@ struct MainView: View {
                             .frame(width: 259)
                         }
                     }
-                    
                     .background(Color.white)
                     .cornerRadius(20)
                     .padding(.trailing, 48)
@@ -70,14 +72,20 @@ struct MainView: View {
                         alignment: .trailing
                     )
                     
-                    Button(action: searchAction) {
-                        Text("Найти")
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color("Blue_Universal"))
-                            .cornerRadius(16)
-                            .frame(width: 150, height: 60)
+                   
+                    if let from = fromStation, let to = toStation {
+                        Button(action: {
+                            path.append(MainDestination.routeResults(from: from, to: to))
+                        }) {
+                            Text("Найти")
+                                .font(.system(size: 17, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color("Blue_Universal"))
+                                .cornerRadius(16)
+                                .frame(width: 150, height: 60)
+                        }
                     }
                     Spacer()
                 }
@@ -101,12 +109,21 @@ struct MainView: View {
                         }
                         path.removeLast(path.count)
                     }
+                case .routeResults(let from, let to):
+                    let client = Client(serverURL: try! Servers.Server1.url(), transport: URLSessionTransport())
+                    let scheduleService = SchedualBetweenStationsService(client: client, apikey: apiKey)
+                    let carrierService = CarrierService(client: client, apikey: apiKey)
+                    RouteListView(
+                        from: from,
+                        to: to,
+                        
+                        betweenStationsService: scheduleService,
+                        carrierService: carrierService
+                    )
                 }
             }
         }
     }
-    
-    
     
     private func swapCities() {
         let temp = fromStation

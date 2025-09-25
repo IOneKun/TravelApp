@@ -17,7 +17,10 @@ struct CitySelectionView: View {
         "Горный Воздух",
         "Краснодар",
         "Казань",
-        "Омск"
+        "Омск",
+        "Анапа",
+        "Новороссийск",
+        "Владивосток"
     ]
     
     private var filteredCities: [String] {
@@ -33,6 +36,7 @@ struct CitySelectionView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(Color("Gray_Universal"))
+                    .padding(.leading, 8)
                 
                 TextField("Введите запрос", text: $searchText)
                     .foregroundColor(Color("Black_Universal"))
@@ -94,7 +98,7 @@ struct CitySelectionView: View {
                     dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color("Black_Universal"))
                 }
             }
         }

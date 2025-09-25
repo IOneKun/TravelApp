@@ -26,6 +26,7 @@ struct StationSelectionView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(Color("Gray_Universal"))
+                    .padding(.leading, 8) 
                 
                 TextField("Введите запрос", text: $searchText)
                     .foregroundColor(Color("Black_Universal"))
