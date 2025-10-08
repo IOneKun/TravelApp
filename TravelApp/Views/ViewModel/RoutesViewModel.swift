@@ -2,9 +2,10 @@ import SwiftUI
 
 @MainActor
 final class RouteSearchViewModel: ObservableObject {
+    
     @Published var routes: [RouteModel] = []
+    @Published var filteredRoutes: [RouteModel] = []
     @Published var isLoading: Bool = false
-    @Published var errorMessage: String?
     
     private let betweenStationsService: ScheduleBetweenStationsProtocol
     private let carrierService: CarrierServiceProtocol
@@ -17,10 +18,10 @@ final class RouteSearchViewModel: ObservableObject {
         self.carrierService = carrierService
     }
     
-    
     func searchRoutes(from: String, to: String, date: String) async {
+        if isLoading { return }
+        
         isLoading = true
-        errorMessage = nil
         routes = []
         
         do {
@@ -30,18 +31,6 @@ final class RouteSearchViewModel: ObservableObject {
                 date: date,
                 transfers: true
             )
-            
-            do {
-                    let encoder = JSONEncoder()
-                    encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-                    let data = try encoder.encode(response)
-                    if let jsonString = String(data: data, encoding: .utf8) {
-                        print("=== FULL RESPONSE JSON ===")
-                        print(jsonString)
-                    }
-                } catch {
-                    print("Ошибка кодирования ответа в JSON: \(error)")
-                }
             
             var mappedRoutes: [RouteModel] = []
             
@@ -54,7 +43,7 @@ final class RouteSearchViewModel: ObservableObject {
                 else { continue }
                 
                 let carrierName = segment.thread?.carrier?.title ?? "Нет имени перевозчика"
-                let carrierLogo = segment.thread?.carrier?.logo ?? "Нет лого перевозчика"
+                let carrierLogo = segment.thread?.carrier?.logo ?? ""
                 let duration = segment.duration ?? 0
                 
                 let route = RouteModel(
@@ -65,17 +54,66 @@ final class RouteSearchViewModel: ObservableObject {
                     carrierName: carrierName,
                     carrierLogo: carrierLogo,
                     duration: duration,
-                    transferCity: nil
+                    transferCity: nil,
+                    hasTransfer: false
                 )
+                mappedRoutes.append(route)
+            }
+            
+            for interval in response.interval_segments ?? [] {
+                guard
+                    let fromTitle = interval.from?.title,
+                    let toTitle = interval.to?.title,
+                    let beginTime = interval.interval?.begin_time,
+                    let endTime = interval.interval?.end_time
+                else { continue }
                 
+                let carrierName = interval.thread?.carrier?.title ?? "Нет имени перевозчика"
+                let carrierLogo = interval.thread?.carrier?.logo ?? ""
+                let duration = interval.duration ?? 0
+                
+                let route = RouteModel(
+                    fromTitle: fromTitle,
+                    toTitle: toTitle,
+                    departure: beginTime,
+                    arrival: endTime,
+                    carrierName: carrierName,
+                    carrierLogo: carrierLogo,
+                    duration: duration,
+                    transferCity: nil,
+                    hasTransfer: interval.has_transfers ?? false
+                )
                 mappedRoutes.append(route)
             }
             
             routes = mappedRoutes
+            filteredRoutes = mappedRoutes
+            isLoading = false
+            
         } catch {
-            errorMessage = "Ошибка: \(error.localizedDescription)"
+            ErrorManager.shared.handle(error: error)
+            isLoading = false
+        }
+    }
+    
+    
+    func applyFilters(times: Set<String>, allowTransfers: Bool?) {
+        print("APPLY FILTERS", times)
+        var filtered = routes
+        
+        if !times.isEmpty {
+            filtered = filtered.filter { route in
+                times.contains(route.timeCategory)
+            }
         }
         
-        isLoading = false
+        if let allow = allowTransfers {
+            filtered = filtered.filter { route in
+                allow ? route.hasTransfer : !route.hasTransfer
+            }
+        }
+        print("FILTERED ROUTES", filtered.map { $0.fromTitle + "→" + $0.toTitle })
+        filteredRoutes = filtered
     }
 }
+

@@ -11,7 +11,6 @@ struct StationSelectionView: View {
     @State private var searchText = ""
     @State private var stations: [StationUI] = []
     @State private var isLoading = true
-    @State private var errorMessage: String?
     
     private var filteredStations: [StationUI] {
         if searchText.isEmpty {
@@ -22,77 +21,76 @@ struct StationSelectionView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(Color("Gray_Universal"))
-                    .padding(.leading, 8) 
-                
-                TextField("Введите запрос", text: $searchText)
-                    .foregroundColor(Color("Black_Universal"))
-                    .autocorrectionDisabled(true)
-                
-                if !searchText.isEmpty {
-                    Button(action: { searchText = "" }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(Color("Gray_Universal"))
-                    }
-                }
-            }
-            .frame(height: 36)
-            .background(Color("Light_Gray"))
-            .cornerRadius(10)
-            .padding(.horizontal)
-            
-            if isLoading {
-                ProgressView("Загрузка станций…")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let errorMessage = errorMessage {
-                Text("Ошибка: \(errorMessage)")
-                    .foregroundColor(.red)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if stations.isEmpty {
-                Text("Станции не найдены")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    ForEach(filteredStations) { station in
-                        Button {
-                            onSelect(station)
-                        } label: {
-                            HStack {
-                                Text(station.name)
-                                    .foregroundColor(.black)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.black)
-                            }
-                            .frame(height: 60)
-                            .contentShape(Rectangle())
+        ZStack {
+            VStack(spacing: 0) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(Color("Gray_Universal"))
+                        .padding(.leading, 8)
+                    
+                    TextField("Введите запрос", text: $searchText)
+                        .foregroundColor(Color("Black_Universal"))
+                        .autocorrectionDisabled(true)
+                    
+                    if !searchText.isEmpty {
+                        Button(action: { searchText = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(Color("Gray_Universal"))
                         }
-                        .listRowBackground(Color.white)
-                        .buttonStyle(PlainButtonStyle())
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
-                .listStyle(PlainListStyle())
-            }
-        }
-        .navigationTitle("Выбор станции")
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                .frame(height: 36)
+                .background(Color("Light_Gray"))
+                .cornerRadius(10)
+                .padding(.horizontal)
+                
+                if isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if stations.isEmpty {
+                    Text("Станции не найдены")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List {
+                        ForEach(filteredStations) { station in
+                            Button {
+                                onSelect(station)
+                            } label: {
+                                HStack {
+                                    Text(station.name)
+                                        .foregroundColor(.black)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .foregroundColor(.black)
+                                }
+                                .frame(height: 60)
+                                .contentShape(Rectangle())
+                            }
+                            .listRowBackground(Color.white)
+                            .buttonStyle(PlainButtonStyle())
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                        }
+                    }
+                    .padding(.top)
+                    .listStyle(PlainListStyle())
                 }
             }
-        }
-        .task {
-            await loadStations()
+            .navigationTitle("Выбор станции")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                    }
+                }
+            }
+            .task {
+                await loadStations()
+            }
         }
     }
     
@@ -111,8 +109,8 @@ struct StationSelectionView: View {
             self.stations = response.toUIModels(for: city)
             self.isLoading = false
         } catch {
-            self.errorMessage = error.localizedDescription
-            self.isLoading = false
+            ErrorManager.shared.handle(error: error)
+            isLoading = false
         }
     }
 }

@@ -2,6 +2,10 @@ import SwiftUI
 import OpenAPIRuntime
 import OpenAPIURLSession
 
+enum RouteListDestination: Hashable {
+    case filter
+}
+
 struct RouteListView: View {
     
     @Environment(\.dismiss) private var dismiss
@@ -9,67 +13,59 @@ struct RouteListView: View {
     let from: StationUI
     let to: StationUI
     let date: String
-
-    @StateObject private var viewModel: RouteSearchViewModel
-
-    init(
-        from: StationUI,
-        to: StationUI,
-        date: String = Date().toAPIDateString(),
-        betweenStationsService: ScheduleBetweenStationsProtocol,
-        carrierService: CarrierServiceProtocol
-    ) {
-        self.from = from
-        self.to = to
-        self.date = date
-        _viewModel = StateObject(
-            wrappedValue: RouteSearchViewModel(
-                betweenStationsService: betweenStationsService,
-                carrierService: carrierService
-            )
-        )
-    }
-
+    @Binding var path: NavigationPath
+    @ObservedObject private var errorManager = ErrorManager.shared
+    
+    @StateObject var viewModel: RouteSearchViewModel
+    
     var body: some View {
-        VStack(spacing: 16) {
-            
-            Text("\(from.name) → \(to.name)")
-                .font(.system(size: 24, weight: .bold))
-                .bold()
-                .lineLimit(nil)
-                .padding(.leading)
-                .padding(.trailing)
-            
-            if viewModel.isLoading {
-                ProgressView("Загрузка маршрутов…")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let error = viewModel.errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
-                    .multilineTextAlignment(.center)
-                    .padding()
-            } else if viewModel.routes.isEmpty {
-                Text("Вариантов нет")
+        ZStack {
+            VStack(spacing: 16) {
+                Text("\(from.name) → \(to.name)")
                     .font(.system(size: 24, weight: .bold))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(viewModel.routes) { route in
-                            RouteCell(route: route)
+                    .lineLimit(nil)
+                    .padding(.horizontal)
+                
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if viewModel.filteredRoutes.isEmpty {
+                    Text("Вариантов нет")
+                        .font(.system(size: 24, weight: .bold))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 8) {
+                            ForEach(viewModel.filteredRoutes) { route in
+                                RouteCell(route: route)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .overlay(alignment: .bottom) {
+                        Button(action: {
+                            path.append(RouteListDestination.filter)
+                        }) {
+                            Text("Уточнить время")
+                                .font(.system(size: 17, weight: .bold))
+                                .foregroundColor(Color("White_Universal"))
+                                .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 60)
+                                .background(Color("Blue_Universal"))
+                                .cornerRadius(16)
+                                .padding(.horizontal)
                         }
                     }
-                    .padding(.trailing)
-                    .padding(.leading)
                 }
+            }
+            if let error = errorManager.networkError {
+                NetworkStatusView(error: error)
+                    .transition(.opacity)
             }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
+                Button(action: { dismiss() }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(Color("Black_Universal"))
                 }
@@ -77,6 +73,13 @@ struct RouteListView: View {
         }
         .task {
             await viewModel.searchRoutes(from: from.id, to: to.id, date: date)
+        }
+        .navigationDestination(for: RouteListDestination.self) { destination in
+            switch destination {
+            case .filter:
+                FilterView()
+                    .environmentObject(viewModel)
+            }
         }
     }
 }
@@ -92,6 +95,8 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ru_RU")
         dateFormatter.dateFormat = "d MMMM"
-        return dateFormatter.string(from: self) 
+        dateFormatter.timeZone = TimeZone(identifier: "Europe/Moscow")
+        return dateFormatter.string(from: self)
     }
 }
+

@@ -1,14 +1,4 @@
 import SwiftUI
-let exampleRoute = RouteModel(
-    fromTitle: "Москва",
-    toTitle: "Казань",
-    departure: Date(),
-    arrival: Date().addingTimeInterval(5*3600),
-    carrierName: "РЖД",
-    carrierLogo: "",
-    duration: 50,
-    transferCity: nil
-)
 
 let timeFormatter: DateFormatter = {
     let f = DateFormatter()
@@ -18,7 +8,7 @@ let timeFormatter: DateFormatter = {
 }()
 struct RouteCell: View {
     let route: RouteModel
-   
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .top) {
@@ -41,7 +31,7 @@ struct RouteCell: View {
                     }
                     Text(route.carrierName)
                         .font(.system(size: 17, weight: .regular))
-                        
+                    
                 }
                 
                 Spacer()
@@ -57,20 +47,20 @@ struct RouteCell: View {
             }
             
             HStack(alignment: .center) {
-                Text(timeFormatter.string(from: route.arrival))
+                Text(timeFormatter.string(from: route.departure))
                 Spacer()
                 ZStack {
-                        Rectangle()
-                            .frame(height: 1)
-                            .foregroundColor(Color("Gray_Universal"))
-                        
-                        Text(formatDuration(route.duration))
-                            .font(.footnote)
-                            .padding(.horizontal, 8)
-                            .background(Color("Light_Gray"))
-                    }
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(Color("Gray_Universal"))
                     
-                Text(timeFormatter.string(from: route.departure))
+                    Text(formatDuration(route.duration))
+                        .font(.footnote)
+                        .padding(.horizontal, 8)
+                        .background(Color("Light_Gray"))
+                }
+                
+                Text(timeFormatter.string(from: route.arrival))
             }
             .font(.subheadline)
         }
@@ -89,6 +79,4 @@ func formatDuration(_ seconds: Int) -> String {
         return "\(minutes) мин"
     }
 }
-#Preview {
-    RouteCell(route: exampleRoute)
-}
+
