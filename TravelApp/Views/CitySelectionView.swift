@@ -58,7 +58,7 @@ struct CitySelectionView: View {
                 VStack {
                     Spacer()
                     Text("Город не найден")
-                        .foregroundColor(Color("Black_Universal"))
+                        .foregroundColor(Color("White_Universal"))
                         .font(.system(size: 24, weight: .bold))
                         .padding(.vertical, 20)
                     Spacer()
@@ -72,15 +72,15 @@ struct CitySelectionView: View {
                         } label: {
                             HStack {
                                 Text(city)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color("Black_Universal"))
                                 Spacer()
                                 Image(systemName: "chevron.right")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color("Black_Universal"))
                             }
                             .frame(height: 60)
                             .contentShape(Rectangle())
                         }
-                        .listRowBackground(Color.white)
+                        .listRowBackground(Color("tabBarColor"))
                         .buttonStyle(PlainButtonStyle())
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -90,7 +90,7 @@ struct CitySelectionView: View {
             }
         }
         .listStyle(PlainListStyle())
-        .background(Color.white)
+        .background(Color("tabBarColor"))
         .navigationTitle("Выбор города")
         .navigationBarBackButtonHidden(true)
         .toolbar {

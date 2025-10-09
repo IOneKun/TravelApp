@@ -31,6 +31,7 @@ struct RouteCell: View {
                     }
                     Text(route.carrierName)
                         .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(Color("BLACK"))
                     
                 }
                 
@@ -38,6 +39,7 @@ struct RouteCell: View {
                 
                 Text(route.date.toUIDateString())
                     .font(.system(size: 12, weight: .regular))
+                    .foregroundColor(Color("BLACK"))
             }
             
             if let transfer = route.transferCity {
@@ -48,6 +50,7 @@ struct RouteCell: View {
             
             HStack(alignment: .center) {
                 Text(timeFormatter.string(from: route.departure))
+                    .foregroundColor(Color("BLACK"))
                 Spacer()
                 ZStack {
                     Rectangle()
@@ -57,15 +60,17 @@ struct RouteCell: View {
                     Text(formatDuration(route.duration))
                         .font(.footnote)
                         .padding(.horizontal, 8)
-                        .background(Color("Light_Gray"))
+                        .background(Color("GrayCell"))
+                        .foregroundColor(Color("BLACK"))
                 }
                 
                 Text(timeFormatter.string(from: route.arrival))
+                    .foregroundColor(Color("BLACK"))
             }
             .font(.subheadline)
         }
         .padding()
-        .background(Color("Light_Gray"))
+        .background(Color("GrayCell"))
         .cornerRadius(24)
     }
 }

@@ -20,6 +20,9 @@ struct RouteListView: View {
     
     var body: some View {
         ZStack {
+            Color("tabBarColor")
+                .ignoresSafeArea()
+                .zIndex(0)
             VStack(spacing: 16) {
                 Text("\(from.name) → \(to.name)")
                     .font(.system(size: 24, weight: .bold))

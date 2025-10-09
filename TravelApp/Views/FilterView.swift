@@ -13,12 +13,17 @@ struct FilterView: View {
     var onApply: ((Set<String>, Bool?) -> Void)?
     
     var body: some View {
+        
         ZStack {
+            Color("tabBarColor")
+                .ignoresSafeArea(.all)
+                .zIndex(0)
             VStack(alignment: .leading, spacing: 16) {
                 Text("Время отправления")
                     .font(.system(size: 24, weight: .bold))
                     .padding(.bottom)
-                
+                    .foregroundColor(Color("Black_Universal"))
+                    
                 VStack(alignment: .leading, spacing: 32) {
                     
                     filterRow(title: "Утро 6:00 - 12:00")
@@ -26,11 +31,13 @@ struct FilterView: View {
                     filterRow(title: "Вечер 18:00 - 00:00")
                     filterRow(title: "Ночь 00:00 - 06:00")
                 }
+                
                 .padding(.bottom)
                 
                 Text("Показывать варианты с пересадками")
                     .font(.system(size: 24, weight: .bold))
                     .padding(.bottom)
+                    .foregroundColor(Color("Black_Universal"))
                 
                 VStack(alignment: .leading, spacing: 32) {
                     transferRow(title: "Да", value: true)
@@ -38,6 +45,7 @@ struct FilterView: View {
                 }
                 Spacer()
             }
+            .padding()
             if hasSelection {
                 VStack {
                     Spacer()
@@ -57,9 +65,8 @@ struct FilterView: View {
                 }
             }
         }
-        .padding()
+        
         .listStyle(PlainListStyle())
-        .background(Color.white)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -83,7 +90,7 @@ struct FilterView: View {
             HStack {
                 Text(title)
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color("Black_Universal"))
                 Spacer()
                 Image(systemName: selectedTimes.contains(title) ? "checkmark.square.fill" : "square")
                     .foregroundColor(Color("Black_Universal"))
@@ -97,7 +104,7 @@ struct FilterView: View {
         } label: {
             HStack {
                 Text(title)
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color("Black_Universal"))
                     .font(.system(size: 17, weight: .regular))
                 Spacer()
                 Image(systemName: allowTransfers == value ? "largecircle.fill.circle" : "circle")

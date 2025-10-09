@@ -2,7 +2,6 @@ import SwiftUI
 import OpenAPIRuntime
 import OpenAPIURLSession
 
-
 struct StationSelectionView: View {
     @Environment(\.dismiss) private var dismiss
     let city: String
@@ -22,6 +21,9 @@ struct StationSelectionView: View {
     
     var body: some View {
         ZStack {
+            Color("tabBarColor")
+                .ignoresSafeArea()
+                .zIndex(0)
             VStack(spacing: 0) {
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -58,20 +60,22 @@ struct StationSelectionView: View {
                             } label: {
                                 HStack {
                                     Text(station.name)
-                                        .foregroundColor(.black)
+                                        .foregroundColor(Color("Black_Universal"))
                                     Spacer()
                                     Image(systemName: "chevron.right")
-                                        .foregroundColor(.black)
+                                        .foregroundColor(Color("Black_Universal"))
                                 }
                                 .frame(height: 60)
                                 .contentShape(Rectangle())
                             }
-                            .listRowBackground(Color.white)
+                            .listRowBackground(Color("tabBarColor"))
                             .buttonStyle(PlainButtonStyle())
                             .listRowSeparator(.hidden)
                             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                         }
                     }
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
                     .padding(.top)
                     .listStyle(PlainListStyle())
                 }
@@ -84,7 +88,7 @@ struct StationSelectionView: View {
                         dismiss()
                     }) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
+                            .foregroundColor(Color("Black_Universal"))
                     }
                 }
             }
@@ -94,6 +98,9 @@ struct StationSelectionView: View {
         }
     }
     
+    
+    
+    // MARK: Load Stations
     private func loadStations() async {
         do {
             let client = Client(
@@ -110,7 +117,8 @@ struct StationSelectionView: View {
             self.isLoading = false
         } catch {
             ErrorManager.shared.handle(error: error)
-            isLoading = false
+            self.isLoading = false
         }
     }
 }
+

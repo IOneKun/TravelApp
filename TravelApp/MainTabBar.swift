@@ -15,6 +15,8 @@ struct MainView: View {
     @State private var path = NavigationPath()
     @State private var selectedTab = 0
     
+    
+    
     @StateObject private var routeViewModel: RouteSearchViewModel = {
         let client = Client(serverURL: try! Servers.Server1.url(), transport: URLSessionTransport())
         let scheduleService = SchedualBetweenStationsService(client: client, apikey: apiKey)
@@ -25,20 +27,23 @@ struct MainView: View {
     @ObservedObject private var errorManager = ErrorManager.shared
     
     var body: some View {
-        ZStack {
-            NavigationStack(path: $path) {
-                TabView(selection: $selectedTab) {
+        NavigationStack(path: $path) {
+            TabView(selection: $selectedTab) {
+                ZStack {
+                    Color("tabBarColor")
+                        .ignoresSafeArea()
+                    
                     VStack {
                         Spacer()
+                        
                         VStack(spacing: 0) {
                             Button {
                                 path.append(MainDestination.stationSelection(selectingFromStation: true))
                             } label: {
                                 HStack {
                                     Text(fromStation?.name ?? "Откуда")
-                                        .foregroundColor(fromStation == nil ? Color("Gray_Universal") : Color("Black_Universal"))
+                                        .foregroundColor(fromStation == nil ? Color("Gray_Universal") : Color("BLACK"))
                                         .lineLimit(1)
-                                        .truncationMode(.tail)
                                     Spacer()
                                 }
                                 .padding()
@@ -46,14 +51,14 @@ struct MainView: View {
                                 .cornerRadius(20)
                                 .frame(width: 259)
                             }
+                            
                             Button {
                                 path.append(MainDestination.stationSelection(selectingFromStation: false))
                             } label: {
                                 HStack {
                                     Text(toStation?.name ?? "Куда")
-                                        .foregroundColor(toStation == nil ? Color("Gray_Universal") : Color("Black_Universal"))
+                                        .foregroundColor(toStation == nil ? Color("Gray_Universal") : Color("BLACK"))
                                         .lineLimit(1)
-                                        .truncationMode(.tail)
                                     Spacer()
                                 }
                                 .padding()
@@ -96,48 +101,43 @@ struct MainView: View {
                                     .frame(width: 150, height: 60)
                             }
                         }
+                        
                         Spacer()
                     }
+                }
+                .tabItem {
+                    Image(systemName: "arrow.up.message.fill")
+                }
+                .tag(0)
+                
+                SettingsView()
+                    .background(Color("tabBarColor").ignoresSafeArea())
                     .tabItem {
-                        Image(systemName: "arrow.up.message.fill")
-                        
+                        Image(systemName: "gearshape.fill")
                     }
-                    .tag(0)
-                    
-                    SettingsView()
-                        .tabItem {
-                            Image(systemName: "gearshape.fill")
-                        }
-                        .tag(1)
-                }
-                .tint(Color("Black_Universal"))
-                .navigationDestination(for: MainDestination.self) { destination in
-                    switch destination {
-                    case .stationSelection(let selectingFromStation):
-                        CitySelectionView { selectedStation in
-                            if selectingFromStation {
-                                fromStation = selectedStation
-                            } else {
-                                toStation = selectedStation
-                            }
-                            path.removeLast(path.count)
-                        }
-                    case .routeResults(let from, let to):
-                        
-                        RouteListView(
-                            from: from,
-                            to: to,
-                            date: Date().toAPIDateString(),
-                            path: $path,
-                            viewModel: routeViewModel
-                        )
-                    }
-                }
+                    .tag(1)
             }
-            if let error = errorManager.networkError {
-                NetworkStatusView(error: error)
-                    .transition(.opacity)
-                    .zIndex(1)
+            .tint(Color("Black_Universal"))
+            .navigationDestination(for: MainDestination.self) { destination in
+                switch destination {
+                case .stationSelection(let selectingFromStation):
+                    CitySelectionView { selectedStation in
+                        if selectingFromStation {
+                            fromStation = selectedStation
+                        } else {
+                            toStation = selectedStation
+                        }
+                        path.removeLast(path.count)
+                    }
+                case .routeResults(let from, let to):
+                    RouteListView(
+                        from: from,
+                        to: to,
+                        date: Date().toAPIDateString(),
+                        path: $path,
+                        viewModel: routeViewModel
+                    )
+                }
             }
         }
     }
@@ -147,12 +147,7 @@ struct MainView: View {
         fromStation = toStation
         toStation = temp
     }
-    
-    private func searchAction() {
-        print("searching")
-    }
 }
-
 struct SettingsView: View {
     var body: some View {
         NavigationStack {
@@ -161,7 +156,7 @@ struct SettingsView: View {
         }
     }
 }
-
 #Preview {
     MainView()
 }
+
