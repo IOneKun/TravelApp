@@ -1,129 +1,153 @@
 import SwiftUI
+import OpenAPIRuntime
+import OpenAPIURLSession
 
 enum MainDestination: Hashable {
-    case citySelection(selectingFromCity: Bool)
-    case stationSelection(city: String, selectingFromCity: Bool)
+    case stationSelection(selectingFromStation: Bool)
+    case routeResults(from: StationUI, to: StationUI)
 }
 
+private let apiKey = "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
+
 struct MainView: View {
-    @State private var fromCity: String = ""
-    @State private var toCity: String = ""
+    @State private var fromStation: StationUI?
+    @State private var toStation: StationUI?
     @State private var path = NavigationPath()
+    @State private var selectedTab = 0
+    
+    
+    
+    @StateObject private var routeViewModel: RouteSearchViewModel = {
+        let client = Client(serverURL: try! Servers.Server1.url(), transport: URLSessionTransport())
+        let scheduleService = SchedualBetweenStationsService(client: client, apikey: apiKey)
+        let carrierService = CarrierService(client: client, apikey: apiKey)
+        return RouteSearchViewModel(betweenStationsService: scheduleService, carrierService: carrierService)
+    }()
+    
+    @ObservedObject private var errorManager = ErrorManager.shared
     
     var body: some View {
         NavigationStack(path: $path) {
-            TabView {
-                VStack {
-                    Spacer()
-                    VStack(spacing: 0) {
-                        Button {
-                            path.append(MainDestination.citySelection(selectingFromCity: true))
-                        } label: {
-                            HStack {
-                                Text(fromCity.isEmpty ? "Откуда" : fromCity)
-                                    .foregroundColor(fromCity.isEmpty ? .gray : .black)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(20)
-                            .frame(width: 259)
-                        }
-                        Button {
-                            path.append(MainDestination.citySelection(selectingFromCity: false))
-                        } label: {
-                            HStack {
-                                Text(toCity.isEmpty ? "Куда" : toCity)
-                                    .foregroundColor(toCity.isEmpty ? .gray : .black)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(20)
-                            .frame(width: 259)
-                        }
-                    }
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .padding(.trailing, 48)
-                    .frame(width: 343, height: 128)
-                    .background(Color("Blue_Universal"))
-                    .cornerRadius(20)
-                    .overlay(
-                        Button(action: swapCities) {
-                            Image(systemName: "arrow.2.squarepath")
-                                .font(.system(size: 24))
-                                .foregroundColor(Color("Blue_Universal"))
-                                .padding(8)
-                                .background(Color.white)
-                                .clipShape(Circle())
-                                .shadow(radius: 2)
-                        }
-                            .offset(x: -8),
-                        alignment: .trailing
-                    )
+            TabView(selection: $selectedTab) {
+                ZStack {
+                    Color("tabBarColor")
+                        .ignoresSafeArea()
                     
-                    Button(action: searchAction) {
-                        Text("Найти")
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color("Blue_Universal"))
-                            .cornerRadius(16)
-                            .frame(width: 150, height: 60)
+                    VStack {
+                        Spacer()
+                        
+                        VStack(spacing: 0) {
+                            Button {
+                                path.append(MainDestination.stationSelection(selectingFromStation: true))
+                            } label: {
+                                HStack {
+                                    Text(fromStation?.name ?? "Откуда")
+                                        .foregroundColor(fromStation == nil ? Color("Gray_Universal") : Color("BLACK"))
+                                        .lineLimit(1)
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(Color("White_Universal"))
+                                .cornerRadius(20)
+                                .frame(width: 259)
+                            }
+                            
+                            Button {
+                                path.append(MainDestination.stationSelection(selectingFromStation: false))
+                            } label: {
+                                HStack {
+                                    Text(toStation?.name ?? "Куда")
+                                        .foregroundColor(toStation == nil ? Color("Gray_Universal") : Color("BLACK"))
+                                        .lineLimit(1)
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(Color("White_Universal"))
+                                .cornerRadius(20)
+                                .frame(width: 259)
+                            }
+                        }
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .padding(.trailing, 48)
+                        .frame(width: 343, height: 128)
+                        .background(Color("Blue_Universal"))
+                        .cornerRadius(20)
+                        .overlay(
+                            Button(action: swapCities) {
+                                Image(systemName: "arrow.2.squarepath")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(Color("Blue_Universal"))
+                                    .padding(8)
+                                    .background(Color("White_Universal"))
+                                    .clipShape(Circle())
+                                    .shadow(radius: 2)
+                            }
+                                .offset(x: -8),
+                            alignment: .trailing
+                        )
+                        
+                        if let from = fromStation, let to = toStation {
+                            Button(action: {
+                                path.append(MainDestination.routeResults(from: from, to: to))
+                            }) {
+                                Text("Найти")
+                                    .font(.system(size: 17, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color("Blue_Universal"))
+                                    .cornerRadius(16)
+                                    .frame(width: 150, height: 60)
+                            }
+                        }
+                        
+                        Spacer()
                     }
-                    Spacer()
                 }
                 .tabItem {
                     Image(systemName: "arrow.up.message.fill")
                 }
+                .tag(0)
                 
                 SettingsView()
+                    .background(Color("tabBarColor").ignoresSafeArea())
                     .tabItem {
                         Image(systemName: "gearshape.fill")
                     }
+                    .tag(1)
             }
-            .tint(.black)
+            .tint(Color("Black_Universal"))
             .navigationDestination(for: MainDestination.self) { destination in
                 switch destination {
-                case .citySelection(let selectingFromCity):
-                    CitySelectionView { selectedCity in
-                        if selectingFromCity {
-                            fromCity = selectedCity
+                case .stationSelection(let selectingFromStation):
+                    CitySelectionView { selectedStation in
+                        if selectingFromStation {
+                            fromStation = selectedStation
                         } else {
-                            toCity = selectedCity
+                            toStation = selectedStation
                         }
                         path.removeLast(path.count)
                     }
-                case .stationSelection(let city, let selectingFromCity):
-                    StationSelectionView(city: city) { station in
-                        if selectingFromCity {
-                            fromCity = station
-                        } else {
-                            toCity = station 
-                        }
-                        path.removeLast(path.count)
-                    }
+                case .routeResults(let from, let to):
+                    RouteListView(
+                        from: from,
+                        to: to,
+                        date: Date().toAPIDateString(),
+                        path: $path,
+                        viewModel: routeViewModel
+                    )
                 }
             }
         }
     }
     
     private func swapCities() {
-        let temp = fromCity
-        fromCity = toCity
-        toCity = temp
-    }
-    
-    private func searchAction() {
-        print("Ищем: \(fromCity) → \(toCity)")
+        let temp = fromStation
+        fromStation = toStation
+        toStation = temp
     }
 }
-
 struct SettingsView: View {
     var body: some View {
         NavigationStack {
@@ -132,7 +156,6 @@ struct SettingsView: View {
         }
     }
 }
-
 #Preview {
     MainView()
 }

@@ -4,7 +4,7 @@ import OpenAPIURLSession
 
 struct CitySelectionView: View {
     @Environment(\.dismiss) private var dismiss
-    let onSelect: (String) -> Void
+    let onSelect: (StationUI) -> Void
     
     @State private var searchText = ""
     @State private var selectedCity: String? = nil
@@ -17,7 +17,10 @@ struct CitySelectionView: View {
         "Горный Воздух",
         "Краснодар",
         "Казань",
-        "Омск"
+        "Омск",
+        "Анапа",
+        "Новороссийск",
+        "Владивосток"
     ]
     
     private var filteredCities: [String] {
@@ -33,6 +36,7 @@ struct CitySelectionView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(Color("Gray_Universal"))
+                    .padding(.leading, 8)
                 
                 TextField("Введите запрос", text: $searchText)
                     .foregroundColor(Color("Black_Universal"))
@@ -54,7 +58,7 @@ struct CitySelectionView: View {
                 VStack {
                     Spacer()
                     Text("Город не найден")
-                        .foregroundColor(Color("Black_Universal"))
+                        .foregroundColor(Color("White_Universal"))
                         .font(.system(size: 24, weight: .bold))
                         .padding(.vertical, 20)
                     Spacer()
@@ -68,24 +72,25 @@ struct CitySelectionView: View {
                         } label: {
                             HStack {
                                 Text(city)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color("Black_Universal"))
                                 Spacer()
                                 Image(systemName: "chevron.right")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color("Black_Universal"))
                             }
                             .frame(height: 60)
                             .contentShape(Rectangle())
                         }
-                        .listRowBackground(Color.white)
+                        .listRowBackground(Color("tabBarColor"))
                         .buttonStyle(PlainButtonStyle())
                         .listRowSeparator(.hidden)
                         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     }
                 }
+                .padding(.top)
             }
         }
         .listStyle(PlainListStyle())
-        .background(Color.white)
+        .background(Color("tabBarColor"))
         .navigationTitle("Выбор города")
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -94,7 +99,7 @@ struct CitySelectionView: View {
                     dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color("Black_Universal"))
                 }
             }
         }
@@ -102,11 +107,10 @@ struct CitySelectionView: View {
             if let city = selectedCity {
                 StationSelectionView(city: city) { selectedStation in
                     onSelect(selectedStation)
+                    dismiss()
                 }
             }
         }
     }
 }
-
-
 

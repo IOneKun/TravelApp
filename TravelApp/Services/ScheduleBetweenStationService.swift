@@ -5,7 +5,7 @@ import OpenAPIURLSession
 typealias ScheduleBetweenStations = Components.Schemas.Segments
 
 protocol ScheduleBetweenStationsProtocol {
-    func getSchedualBetweenStations(from: String, to: String, date: String?) async throws -> ScheduleBetweenStations
+    func getSchedualBetweenStations(from: String, to: String, date: String?, transfers: Bool) async throws -> ScheduleBetweenStations
 }
 
 final class SchedualBetweenStationsService: ScheduleBetweenStationsProtocol {
@@ -18,7 +18,7 @@ final class SchedualBetweenStationsService: ScheduleBetweenStationsProtocol {
         self.apikey = apikey
     }
     
-    func getSchedualBetweenStations(from: String, to: String, date: String? = nil) async throws -> ScheduleBetweenStations {
+    func getSchedualBetweenStations(from: String, to: String, date: String? = nil, transfers: Bool) async throws -> ScheduleBetweenStations {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -29,7 +29,8 @@ final class SchedualBetweenStationsService: ScheduleBetweenStationsProtocol {
             apikey: apikey,
             from: from,
             to: to,
-            date: finalDate
+            date: finalDate,
+            transfers: transfers
         ))
         return try response.ok.body.json
     }

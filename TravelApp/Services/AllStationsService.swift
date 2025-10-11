@@ -33,12 +33,6 @@ final class AllStationsService: AllStationsServiceProtocol {
     }
 }
 
-struct StationUI: Identifiable {
-    let id: String
-    let name: String
-    let city: String
-}
-
 extension AllStations {
     func toUIModels(for city: String) -> [StationUI] {
         var result: [StationUI] = []
@@ -53,10 +47,8 @@ extension AllStations {
                                 result.append(
                                     StationUI(
                                         id: id,
-                                        name: name,
-                                        city: settlement.title ?? "—"
+                                        name: name)
                                     )
-                                )
                             }
                         }
                     }

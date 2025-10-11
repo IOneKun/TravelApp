@@ -195,7 +195,7 @@ func testScheduleBetweenStations() { //Working Well
                 apikey: "eff82f8a-e9b9-482c-b208-7ae87cf036e1"
             )
             print("Fetching schedule..")
-            let schedule = try await service.getSchedualBetweenStations(from: "c146", to: "c213")
+            let schedule = try await service.getSchedualBetweenStations(from: "c146", to: "c213", transfers: true)
             print("Successfully fetched station schedule: \(schedule)")
         } catch {
             print("Error fetching schedule: \(error)")
