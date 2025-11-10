@@ -148,14 +148,7 @@ struct MainView: View {
         toStation = temp
     }
 }
-struct SettingsView: View {
-    var body: some View {
-        NavigationStack {
-            Text("Здесь будут настройки")
-                .navigationTitle("Настройки")
-        }
-    }
-}
+
 #Preview {
     MainView()
 }

@@ -12,6 +12,8 @@ struct RouteModel: Identifiable, Hashable {
     let duration: Int
     let date = Date()
     var transferCity: String?
+    let carrierPhone: String?
+    let carrierEmail: String? 
     
     let hasTransfer: Bool
     

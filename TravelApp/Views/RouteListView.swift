@@ -4,6 +4,7 @@ import OpenAPIURLSession
 
 enum RouteListDestination: Hashable {
     case filter
+    case carrier(RouteModel)
 }
 
 struct RouteListView: View {
@@ -40,9 +41,16 @@ struct RouteListView: View {
                     ScrollView {
                         LazyVStack(spacing: 8) {
                             ForEach(viewModel.filteredRoutes) { route in
-                                RouteCell(route: route)
+                                Button {
+                                    path.append(RouteListDestination.carrier(route))
+                                } label: {
+                                    RouteCell(route: route)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
+                        
                         .padding(.horizontal)
                     }
                     .overlay(alignment: .bottom) {
@@ -82,6 +90,8 @@ struct RouteListView: View {
             case .filter:
                 FilterView()
                     .environmentObject(viewModel)
+            case .carrier(let route):
+                CarrierDetailView(route: route)
             }
         }
     }
