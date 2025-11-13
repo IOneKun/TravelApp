@@ -34,8 +34,10 @@ struct MainView: View {
                         .ignoresSafeArea()
                     
                     VStack {
+                        StoriesView()
+                            .padding(.top, 16)
                         Spacer()
-                        
+                            .frame(height: 44)
                         VStack(spacing: 0) {
                             Button {
                                 path.append(MainDestination.stationSelection(selectingFromStation: true))
