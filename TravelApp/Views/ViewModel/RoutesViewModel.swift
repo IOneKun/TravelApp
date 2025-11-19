@@ -45,6 +45,17 @@ final class RouteSearchViewModel: ObservableObject {
                 let carrierName = segment.thread?.carrier?.title ?? "Нет имени перевозчика"
                 let carrierLogo = segment.thread?.carrier?.logo ?? ""
                 let duration = segment.duration ?? 0
+                let carrierCode = String(segment.thread?.carrier?.code ?? 0)
+                let carrierSystem = segment.thread?.carrier?.codes?.iata ?? "yandex"
+
+                
+                let carrierInfo = try? await carrierService.getCarrierInfo(
+                    code: carrierCode,
+                    system: carrierSystem
+                )
+                
+                let carrierPhone = carrierInfo?.carrier?.phone
+                let carrierEmail = carrierInfo?.carrier?.email
                 
                 let route = RouteModel(
                     fromTitle: fromTitle,
@@ -54,7 +65,7 @@ final class RouteSearchViewModel: ObservableObject {
                     carrierName: carrierName,
                     carrierLogo: carrierLogo,
                     duration: duration,
-                    transferCity: nil,
+                    transferCity: nil, carrierPhone: carrierPhone, carrierEmail: carrierEmail,
                     hasTransfer: false
                 )
                 mappedRoutes.append(route)
@@ -81,6 +92,8 @@ final class RouteSearchViewModel: ObservableObject {
                     carrierLogo: carrierLogo,
                     duration: duration,
                     transferCity: nil,
+                    carrierPhone: nil,
+                    carrierEmail: nil,
                     hasTransfer: interval.has_transfers ?? false
                 )
                 mappedRoutes.append(route)
