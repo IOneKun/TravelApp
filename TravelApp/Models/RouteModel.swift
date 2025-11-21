@@ -1,7 +1,7 @@
 import SwiftUI
 import Foundation
 
-struct RouteModel: Identifiable, Hashable {
+struct RouteModel: Identifiable, Hashable, Sendable {
     let id = UUID()
     let fromTitle: String
     let toTitle: String

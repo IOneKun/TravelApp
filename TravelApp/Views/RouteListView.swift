@@ -1,6 +1,4 @@
 import SwiftUI
-import OpenAPIRuntime
-import OpenAPIURLSession
 
 enum RouteListDestination: Hashable {
     case filter
@@ -14,9 +12,10 @@ struct RouteListView: View {
     let from: StationUI
     let to: StationUI
     let date: String
-    @Binding var path: NavigationPath
-    @ObservedObject private var errorManager = ErrorManager.shared
     
+    @Binding var path: NavigationPath
+    
+    @ObservedObject private var errorManager = ErrorManager.shared
     @StateObject var viewModel: RouteSearchViewModel
     
     var body: some View {
@@ -24,7 +23,9 @@ struct RouteListView: View {
             Color("tabBarColor")
                 .ignoresSafeArea()
                 .zIndex(0)
+
             VStack(spacing: 16) {
+                
                 Text("\(from.name) → \(to.name)")
                     .font(.system(size: 24, weight: .bold))
                     .lineLimit(nil)
@@ -33,10 +34,12 @@ struct RouteListView: View {
                 if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                 } else if viewModel.filteredRoutes.isEmpty {
                     Text("Вариантов нет")
                         .font(.system(size: 24, weight: .bold))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 8) {
@@ -50,13 +53,12 @@ struct RouteListView: View {
                                 .buttonStyle(.plain)
                             }
                         }
-                        
                         .padding(.horizontal)
                     }
                     .overlay(alignment: .bottom) {
-                        Button(action: {
+                        Button {
                             path.append(RouteListDestination.filter)
-                        }) {
+                        } label: {
                             Text("Уточнить время")
                                 .font(.system(size: 17, weight: .bold))
                                 .foregroundColor(Color("White_Universal"))
@@ -68,6 +70,7 @@ struct RouteListView: View {
                     }
                 }
             }
+
             if let error = errorManager.networkError {
                 NetworkStatusView(error: error)
                     .transition(.opacity)
@@ -90,13 +93,13 @@ struct RouteListView: View {
             case .filter:
                 FilterView()
                     .environmentObject(viewModel)
+
             case .carrier(let route):
                 CarrierDetailView(route: route)
             }
         }
     }
 }
-
 
 extension Date {
     func toAPIDateString() -> String {

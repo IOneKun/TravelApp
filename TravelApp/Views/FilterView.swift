@@ -23,7 +23,7 @@ struct FilterView: View {
                     .font(.system(size: 24, weight: .bold))
                     .padding(.bottom)
                     .foregroundColor(Color("Black_Universal"))
-                    
+                
                 VStack(alignment: .leading, spacing: 32) {
                     
                     filterRow(title: "Утро 6:00 - 12:00")
